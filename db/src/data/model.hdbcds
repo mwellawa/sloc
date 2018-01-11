@@ -1,5 +1,6 @@
 namespace sloc.db.data;
 
+@OData.publish : true
 context model {
 
     /*@@layout{"layoutInfo":{"x":-396,"y":-206}}*/
