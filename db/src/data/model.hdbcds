@@ -1,6 +1,5 @@
 namespace sloc.db.data;
 
-@OData.publish : true
 context model {
 
     /*@@layout{"layoutInfo":{"x":-396,"y":-206}}*/
@@ -8,17 +7,15 @@ context model {
         key id         : Integer generated always as identity(start with 100000 increment by 1 minvalue 100000 no maxvalue);
             store_name : String(35);
     }
-    technical configuration {
-        column store;
-    };
 
     /*@@layout{"layoutInfo":{"x":-110,"y":-183}}*/
     entity StoreAddress {
         key id           : Integer generated always as identity(start with 100000 increment by 1 minvalue 100000 no maxvalue);
         key store_id     : association[*, 1..1] to Store { id };
         key street_id    : association[*, 1..1] to StreetAddress { id };
+        key suburb_id    : association[*, 1..1] to Suburb { id };
         key postcode     : association[*, 1..1] to Postcode { postcode };
-        key state        : association[*, 1..1] to State { state_name };
+        key state        : association[*, 1..1] to State { state };
             addr_remarks : String(30);
             location     : hana.ST_POINT(4326);
     };
@@ -32,15 +29,23 @@ context model {
             store_id  : association[*, 1..1] to Store { id };
     };
 
-    /*@@layout{"layoutInfo":{"x":173,"y":-183.5}}*/
+    /*@@layout{"layoutInfo":{"x":199,"y":-107.5}}*/
     entity Postcode {
         key postcode : String(4);
-            desc     : String(30);
+        	state	 : association[*, 1..1] to State { state };
+            desc     : String(15);
     };
 
-    /*@@layout{"layoutInfo":{"x":180,"y":-53.5}}*/
+    /*@@layout{"layoutInfo":{"x":192,"y":-240.5}}*/
+    entity Suburb {
+        key id       : Integer generated always as identity(start with 100000 increment by 1 minvalue 100000 no maxvalue);
+            suburb   : String(50);
+            postcode : association[*, 1..1] to Postcode { postcode };
+    };
+
+    /*@@layout{"layoutInfo":{"x":192,"y":-16.5}}*/
     entity State {
         key state      : String(3);
-            state_name : String(15);
+            state_name : String(30);
     };
 };
