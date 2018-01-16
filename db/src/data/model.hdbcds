@@ -13,7 +13,7 @@ context model {
         key id           : Integer generated always as identity(start with 100000 increment by 1 minvalue 100000 no maxvalue);
         key store_id     : association[*, 1..1] to Store { id };
         key street_id    : association[*, 1..1] to StreetAddress { id };
-        key suburb_id    : association[*, 1..1] to Suburb { id };
+        key suburb  	 : association[*, 1..1] to Suburb { suburb };
         key postcode     : association[*, 1..1] to Postcode { postcode };
         key state        : association[*, 1..1] to State { state };
             addr_remarks : String(30);
@@ -25,22 +25,20 @@ context model {
         key id        : Integer64 generated always as identity(start with 100000 increment by 1 minvalue 100000 no maxvalue);
             level     : String(20);
             building  : String(15);
-            street_no : String(15);
-            store_id  : association[*, 1..1] to Store { id };
+            street_no : String(30);
+            street    : String(50);
     };
 
     /*@@layout{"layoutInfo":{"x":199,"y":-107.5}}*/
     entity Postcode {
         key postcode : String(4);
-        	state	 : association[*, 1..1] to State { state };
-            desc     : String(15);
+            state    : association[*, 1..1] to State { state };
     };
 
     /*@@layout{"layoutInfo":{"x":192,"y":-240.5}}*/
     entity Suburb {
-        key id       : Integer generated always as identity(start with 100000 increment by 1 minvalue 100000 no maxvalue);
-            suburb   : String(50);
-            postcode : association[*, 1..1] to Postcode { postcode };
+        key	suburb   : String(50);
+        key	postcode : association[*, 1..1] to Postcode { postcode };
     };
 
     /*@@layout{"layoutInfo":{"x":192,"y":-16.5}}*/

@@ -1,0 +1,88 @@
+<mvc:View controllerName="slocui.controller.Main" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:mvc="sap.ui.core.mvc" displayBlock="true"
+	xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout">
+	<App>
+		<pages>
+			<Page title="{i18n>title}">
+				<content>
+					<IconTabBar id="idIconTabBarMain" expanded="true" class="sapUiResponsiveContentPadding">
+						<items>
+							<IconTabFilter icon="sap-icon://hint">
+								<Text text="App Details"/>
+							</IconTabFilter>
+							<IconTabFilter icon="sap-icon://map-3">
+								<Text text="Find Store"/>
+							</IconTabFilter>
+							<IconTabFilter icon="sap-icon://add-coursebook">
+								<l:VerticalLayout id="clAddStore" width="100%">
+									<l:BlockLayout id="blAddStore">
+										<!-- Store Name -->
+										<l:BlockLayoutRow>
+											<l:BlockLayoutCell>
+												<Label text="Store Name" labelFor="storeName"/>
+												<Input id="storeName" type="Text" placeholder="Enter Store Name" required="true"/>
+											</l:BlockLayoutCell>
+										</l:BlockLayoutRow>
+										<!-- Store Address -->
+										<l:BlockLayoutRow>
+											<l:BlockLayoutCell>
+												<Label text="Level" labelFor="storeAddrLevel"/>
+												<Input id="storeAddrLevel" type="Text" placeholder="Enter Level ..."/>
+											</l:BlockLayoutCell>
+											<l:BlockLayoutCell>
+												<Label text="Building" labelFor="storeAddrBuilding"/>
+												<Input id="storeAddrBuilding" type="Text" placeholder="Enter Building No ..."/>
+											</l:BlockLayoutCell>
+											<l:BlockLayoutCell>
+												<Label text="Street No." labelFor="storeAddrStreetNo"/>
+												<Input id="storeAddrStreetNo" type="Text" placeholder="Enter Street No ..." required="true"/>
+											</l:BlockLayoutCell>
+										</l:BlockLayoutRow>
+										<!-- Store Street Address -->
+										<l:BlockLayoutRow>
+											<l:BlockLayoutCell>
+												<Label text="Street Name" labelFor="storeAddrStreetName"/>
+												<Input id="storeAddrStreetName" type="Text" placeholder="Enter Street Name ..." required="true"/>
+											</l:BlockLayoutCell>
+										</l:BlockLayoutRow>
+										<!-- Store Street Region -->
+										<l:BlockLayoutRow>
+											<l:BlockLayoutCell>
+												<Label text="Suburb" labelFor="storeAddrSuburb"/>
+												<Input id="storeAddrSuburb" type="Text" placeholder="Enter Suburb ..." required="true"/>
+											</l:BlockLayoutCell>
+											<l:BlockLayoutCell>
+												<Label text="Postcode" labelFor="storeAddrPostcode"/>
+												<Input id="storeAddrPostcode" type="Text" placeholder="Enter Postcode ..." required="true"/>
+											</l:BlockLayoutCell>
+											<l:BlockLayoutCell>
+												<Label text="State" labelFor="storeAddrState"/>
+												<Input id="storeAddrState" type="Text" placeholder="Enter State ..." required="true"/>
+											</l:BlockLayoutCell>
+										</l:BlockLayoutRow>
+										<!-- Store Location -->
+										<l:BlockLayoutRow>
+											<l:BlockLayoutCell>
+												<Label text="Longitude" labelFor="storeLocLong"/>
+												<Input id="storeLocLon" type="Text" placeholder="Enter Longitude ..." required="true"/>
+											</l:BlockLayoutCell>
+											<l:BlockLayoutCell>
+												<Label text="Latitude" labelFor="storeLocLat"/>
+												<Input id="storeLocLat" type="Text" placeholder="Enter Latitude ..." required="true"/>
+											</l:BlockLayoutCell>
+										</l:BlockLayoutRow>
+										<!-- Add Store Button -->
+										<l:BlockLayoutRow>
+											<l:BlockLayoutCell>
+												<Button type="Accept" text="Create Store" press="onCreateStorePress" width="100%" />
+											</l:BlockLayoutCell>
+										</l:BlockLayoutRow>
+									</l:BlockLayout>
+								</l:VerticalLayout>
+							</IconTabFilter>
+						</items>
+					</IconTabBar>
+				</content>
+			</Page>
+		</pages>
+	</App>
+</mvc:View>

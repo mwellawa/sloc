@@ -1,3 +1,2 @@
 $.response.contentType = "text/plain";
-
-$.response.setBody("Hello World");
+$.response.setBody("sloc js running...");

@@ -18,6 +18,17 @@ modules:
     requires:
       - name: db
       - name: hdi_db
+
+  
+
+
+  
+
+
+  - name: ui
+    type: html5
+    path: ui
+
 resources:
   - name: hdi_db
     type: com.sap.xs.hdi-container
