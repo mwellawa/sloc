@@ -1,0 +1,3 @@
+service {
+	"sloc.db::model.State" as "state";
+}

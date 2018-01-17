@@ -1,4 +1,4 @@
-namespace sloc.db.data;
+namespace sloc.db;
 
 context model {
 
@@ -13,7 +13,7 @@ context model {
         key id           : Integer generated always as identity(start with 100000 increment by 1 minvalue 100000 no maxvalue);
         key store_id     : association[*, 1..1] to Store { id };
         key street_id    : association[*, 1..1] to StreetAddress { id };
-        key suburb  	 : association[*, 1..1] to Suburb { suburb };
+        key suburb       : association[*, 1..1] to Suburb { suburb };
         key postcode     : association[*, 1..1] to Postcode { postcode };
         key state        : association[*, 1..1] to State { state };
             addr_remarks : String(30);
@@ -37,8 +37,8 @@ context model {
 
     /*@@layout{"layoutInfo":{"x":192,"y":-240.5}}*/
     entity Suburb {
-        key	suburb   : String(50);
-        key	postcode : association[*, 1..1] to Postcode { postcode };
+        key suburb   : String(50);
+        key postcode : association[*, 1..1] to Postcode { postcode };
     };
 
     /*@@layout{"layoutInfo":{"x":192,"y":-16.5}}*/

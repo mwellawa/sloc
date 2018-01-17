@@ -1,0 +1,73 @@
+PROCEDURE "sloc.db::createStore" ( 
+
+	IN
+		im_store_name		VARCHAR(35),
+		im_addr_level		VARCHAR(20),
+		im_addr_building	VARCHAR(15),
+		im_addr_street_no	VARCHAR(30),
+		im_addr_street		VARCHAR(50),
+		im_suburb			VARCHAR(50),
+		im_postcode 		VARCHAR(4),
+		im_state			VARCHAR(3),
+	OUT
+		ex_error			VARCHAR(100)
+)
+
+   LANGUAGE SQLSCRIPT
+   SQL SECURITY INVOKER AS
+   --DEFAULT SCHEMA <default_schema_name>
+   --READS SQL DATA AS
+BEGIN
+   /*************************************
+       Write your procedure logic 
+   *************************************/
+   
+	declare v_count integer;
+	declare v_street_addr_id integer;
+	declare v_store_id integer;
+	
+	declare v_state varchar(3);
+	declare v_postcode varchar(4);
+	declare v_suburb varchar(50);
+	declare v_store varchar(35);
+	
+	declare v_point ST_GEOMETRY;
+	
+	/* check if state valid */
+	select "state" into v_state from "sloc.db::model.State" where "state" = im_state;
+	if :v_state <> :im_state then
+		ex_error := 'State ' || :im_state || ' does not exist!';
+	else
+	
+		/* check if postcode exists. If not insert. */
+		select "postcode" into v_postcode from "sloc.db::model.Postcode" 
+		where "postcode" = im_postcode and "state.state" = v_state;
+		if :v_postcode <> :im_postcode then
+			insert into "sloc.db::model.Postcode" values(im_postcode, v_state);
+		end if;
+		
+		/* check if suburb exists. If not insert. */
+		select "suburb" into v_suburb from "sloc.db::model.Suburb"
+		where "suburb" = im_suburb and "postcode.postcode" = v_postcode;
+		if :v_suburb <> im_suburb then
+			insert into "sloc.db::model.Suburb" values(im_suburb, v_postcode);
+		end if;
+		
+		/* check if store exists. if not insert. */
+		select "id","store_name" into v_store_id,v_store from "sloc.db::model.Store"
+		where "store_name" = im_store_name;
+		if :v_store <> :im_store_name then
+			insert into "sloc.db::model.Store" values(im_store_name);
+			v_store_id := current_identity_value();
+		end if;
+		
+		/* insert street address */
+		insert into "sloc.db::model.StreetAddress" values(im_addr_level, im_addr_building, im_addr_street_no, im_addr_street);
+		v_street_addr_id := current_identity_value();
+		
+		/* insert store address */
+		insert into "sloc.db::model.StoreAddress" values(v_store_id, v_street_addr_id, im_suburb, im_postcode, im_state, '', v_point);
+		
+	end if; /* check if state valid */  
+   
+END

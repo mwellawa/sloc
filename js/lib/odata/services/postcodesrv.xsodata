@@ -1,3 +1,0 @@
-service {
-	"sloc.db.data::model.Postcode" as "postcode";
-}
