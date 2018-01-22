@@ -1,11 +1,11 @@
 PROCEDURE "sloc.db::fetchPostcode" ( 
 	
-	IN	im_postcode 	nvarchar(4),
-	IN	im_state		nvarchar(3),
-	IN	im_fetch_only	boolean,
-	OUT	ex_postcode		nvarchar(4),
-	OUT	ex_state		nvarchar(3),
-	OUT	ex_error		nvarchar(100)
+	in	im_postcode 	nvarchar(4),
+	in	im_state		nvarchar(3),
+	in	im_create		boolean,
+	out	ex_postcode		nvarchar(4),
+	out	ex_state		nvarchar(3),
+	out	ex_error		nvarchar(100)
 		
 )
    LANGUAGE SQLSCRIPT
@@ -23,15 +23,27 @@ BEGIN
 	into v_count 
 	from "sloc.db::model.State"
 	where "state" = im_state;
-	if :v_count > 0 then
+	if v_count > 0 then
 		
 		select count(*) into v_count from "sloc.db::model.Postcode"
 		where "postcode" = im_postcode and "state.state" = im_state;
-		if :v_count = 0 then
+		if v_count > 0 then
 		
-			if :im_fetch_only = false then
-				insert into "sloc.db::model.Postcode" values(im_postcode, im_state);
-				select count(*) into v_count from "sloc.db::model.Postcode"
+			select "postcode", "state.state" 
+			into ex_postcode, ex_state 
+			from "sloc.db::model.Postcode"
+			where "postcode" = im_postcode and "state.state" = im_state;		
+		
+		else
+		
+			if :im_create = true then
+				
+				insert into "sloc.db::model.Postcode" 
+				values(im_postcode, im_state);
+				
+				select count(*) 
+				into v_count 
+				from "sloc.db::model.Postcode"
 				where "postcode" = im_postcode and "state.state" = im_state;
 				if :v_count > 0 then
 				
@@ -40,19 +52,15 @@ BEGIN
 					from "sloc.db::model.Postcode"
 					where "postcode" = im_postcode and "state.state" = im_state;			
 				else
-					ex_error := 'Error inserting postcode : ' || :im_postcode;	
+					ex_error = 'Error inserting postcode ' || im_postcode || ' for state ' || im_state;	
 				end if;
 			else
-				ex_error := 'Postcode not Found : ' || :im_postcode || ' State : ' || im_state;
-			end if;	
-		else
-			select "postcode", "state.state" 
-			into ex_postcode, ex_state 
-			from "sloc.db::model.Postcode"
-			where "postcode" = im_postcode and "state.state" = im_state;			
+				ex_error = 'Postcode ' || im_postcode || ' not found for State ' || im_state;
+			end if;		
+			
 		end if;
 	else
-		ex_error := 'Invalid State : ' || :im_state;
+		ex_error = 'Invalid state ' || im_state;
 	end if;
    
 END

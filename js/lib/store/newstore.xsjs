@@ -30,8 +30,8 @@ function createPostcode(postcode, conn) {
 function createSuburb(suburb, conn){
 	var fnSuburb = conn.loadProcedure("sloc.db::fetchSuburb");
 	var result = fnSuburb({
-		IM_POSTCODE: suburb.suburb,
-		IM_STATE: suburb.postcode,
+		IM_POSTCODE: suburb.postcode,
+		IM_SUBURB: suburb.suburb,
 		IM_FETCH_ONLY: false
 	});
 	conn.commit();

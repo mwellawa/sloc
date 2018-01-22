@@ -1,0 +1,20 @@
+PROCEDURE "sloc.db::createSteetAddress" ( 
+	in	im_level		nvarchar(20),
+	in	im_building		nvarchar(15),
+	in	im_street_no	nvarchar(30),
+	in	im_street		nvarchar(50),
+	out	ex_key			bigint
+)
+   LANGUAGE SQLSCRIPT
+   SQL SECURITY INVOKER AS
+   --DEFAULT SCHEMA <default_schema_name>
+   --READS SQL DATA AS
+BEGIN
+   /*************************************
+       Write your procedure logic 
+   *************************************/
+	insert into "sloc.db::model.StreetAddress"
+	values(im_level, im_building, im_street_no, im_street);
+	ex_key = current_identity_value( );
+   
+END

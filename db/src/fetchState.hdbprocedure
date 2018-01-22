@@ -1,0 +1,66 @@
+PROCEDURE "sloc.db::fetchState" ( 
+	in	im_state		nvarchar(3),
+    in  im_state_name	nvarchar(30),	
+	in	im_create		boolean,
+	out ex_state		nvarchar(3),
+	out ex_state_name	nvarchar(30),
+	out ex_error		nvarchar(100)
+)
+   LANGUAGE SQLSCRIPT
+   SQL SECURITY INVOKER AS
+   --DEFAULT SCHEMA <default_schema_name>
+   --READS SQL DATA AS
+BEGIN
+   /*************************************
+       Write your procedure logic 
+   *************************************/
+   
+	declare v_count integer;
+	declare v_state_upper nvarchar(3);
+	
+	/* try to select the state */
+	v_state_upper = upper (im_state);
+	select count(*) 
+	into v_count 
+	from "sloc.db::model.State"
+	where "state" = v_state_upper;
+	if v_count > 0 then
+		
+		/* state found. return it. */
+		select "state", "state_name"
+		into ex_state, ex_state_name
+		from "sloc.db::model.State"
+		where "state" = v_state_upper;
+		
+	else
+		
+		/* state not available. create it if asked to. */
+		if im_create = true then
+		
+			v_state_upper = upper (im_state);
+			insert into "sloc.db::model.State" 
+			values(v_state_upper, im_state_name);
+			
+			select count(*) 
+			into v_count 
+			from "sloc.db::model.State"
+			where "state" = v_state_upper;
+			if :v_count > 0 then
+				
+				select "state", "state_name"
+				into ex_state, ex_state_name
+				from "sloc.db::model.State"
+				where "state" = v_state_upper;
+				
+			else
+				ex_error = 'error inserting state ' || v_state_upper;	
+			end if;
+			
+			
+		else
+			ex_error = 'state ' || v_state_upper || ' does not exist';
+		end if;
+		
+	end if;
+   
+END
