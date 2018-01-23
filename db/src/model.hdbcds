@@ -1,23 +1,23 @@
 namespace sloc.db;
 
 context model {
-    entity Company {
-        key id           : Integer generated always as identity(start with 100000 increment by 1 minvalue 100000 no maxvalue);
-            company_code : String(15);
+    
+    /*@@layout{"layoutInfo":{"x":-93,"y":-290}}*/
+	entity Company {
+        key company_code : String(15);
             company_name : String(45);
     }
 
-    /*@@layout{"layoutInfo":{"x":-396,"y":-206}}*/
+    /*@@layout{"layoutInfo":{"x":-396,"y":-240}}*/
     entity Store {
-        key id            : Integer generated always as identity(start with 100000 increment by 1 minvalue 100000 no maxvalue);
-            company_id    : association[*, 1..1] to Company { id };
-            store_name    : String(35);
+        key store_name   : String(35);
+            company_code : association[*, 1..1] to Company { company_code };
     }
 
-    /*@@layout{"layoutInfo":{"x":-110,"y":-183}}*/
+    /*@@layout{"layoutInfo":{"x":-105,"y":-150}}*/
     entity StoreAddress {
         key id           : Integer generated always as identity(start with 100000 increment by 1 minvalue 100000 no maxvalue);
-            store_id     : association[*, 1..1] to Store { id };
+            store_name   : association[*, 1..1] to Store { store_name };
             street_id    : association[*, 1..1] to StreetAddress { id };
             suburb       : association[*, 1..1] to Suburb { suburb };
             postcode     : association[*, 1..1] to Postcode { postcode };

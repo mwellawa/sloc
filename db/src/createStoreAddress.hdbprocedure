@@ -1,14 +1,12 @@
 PROCEDURE "sloc.db::createStoreAddress" ( 
-	
-	in	im_store_id		integer,
+	in	im_store_name	nvarchar(35),
 	in	im_street_id	integer,
 	in	im_suburb		nvarchar(50),
 	in	im_postcode		nvarchar(4),
 	in	im_state		nvarchar(3),
-	in	im_addr_remarks	nvarchar(30),
+	in	im_remarks		nvarchar(30),
 	in	im_location		nvarchar(30),
-	out ex_key			bigint
-
+	out	ex_key			bigint
 )
    LANGUAGE SQLSCRIPT
    SQL SECURITY INVOKER AS
@@ -18,11 +16,11 @@ BEGIN
    /*************************************
        Write your procedure logic 
    *************************************/
+   
 	declare v_loc_point ST_GEOMETRY;
 	v_loc_point = st_geomfromtext(im_location,'4326');
 	
-	insert into "sloc.db::model.StoreAddress"
-	values(im_store_id, im_street_id, im_suburb, im_postcode, im_state, im_addr_remarks, v_loc_point);
+	insert into "sloc.db::model.StoreAddress" values(im_street_id, im_suburb, im_postcode, im_state, im_remarks, v_loc_point, im_store_name);
 	ex_key = current_identity_value( );
    
 END

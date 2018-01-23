@@ -1,0 +1,59 @@
+PROCEDURE "sloc.db::fetchCompany" ( 
+	in	im_company_code		nvarchar(15),
+	in	im_company_name		nvarchar(45),
+	in	im_create			boolean,
+	out	ex_company_code		nvarchar(15),
+	out ex_company_name		nvarchar(45),
+	out ex_error			nvarchar(100)
+)
+   LANGUAGE SQLSCRIPT
+   SQL SECURITY INVOKER AS
+   --DEFAULT SCHEMA <default_schema_name>
+   --READS SQL DATA AS
+BEGIN
+   /*************************************
+       Write your procedure logic 
+   *************************************/
+   
+	declare v_count integer;
+	declare v_company_code varchar(15);
+   
+	v_company_code = upper(im_company_code);
+	
+	select count(*) 
+	into v_count 
+	from "sloc.db::model.Company"
+	where "company_code" = v_company_code;
+	if v_count > 0 then
+		
+		select "company_code", "company_name"
+		into im_company_code, im_company_name 
+		from "sloc.db::model.Company"
+		where "company_code" = v_company_code;		
+		
+	else
+	
+		if im_create = true then
+			
+			insert into "sloc.db::model.Company" values(v_company_code, im_company_name);
+			select count(*) 
+			into v_count 
+			from "sloc.db::model.Company"
+			where "company_code" = v_company_code;
+			if v_count > 0 then
+				
+				select "company_code", "company_name"
+				into im_company_code, im_company_name 
+				from "sloc.db::model.Company"
+				where "company_code" = v_company_code;				
+				
+			else
+				ex_error = 'error inserting company code ' || v_company_code;
+			end if;
+		else
+			ex_error = 'company code ' || v_company_code || ' not found';
+		end if;
+	
+	end if;
+   
+END
