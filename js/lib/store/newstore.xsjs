@@ -18,7 +18,7 @@ function getOutput(result) {
 /*************************************
  ----- Create State					 
 *************************************/
-function createState(state, conn){
+function createState(state, conn) {
 	var fnFetchPostcode = conn.loadProcedure("sloc.db::fetchState");
 	var result = fnFetchPostcode({
 		IM_STATE: state.state,
@@ -35,7 +35,7 @@ function createPostcode(postcode, conn) {
 	var fnFetchPostcode = conn.loadProcedure("sloc.db::fetchPostcode");
 	var result = fnFetchPostcode({
 		IM_POSTCODE: postcode.postcode,
-		IM_STATE: postcode.state,
+		IM_STATE: postcode.state.state,
 		IM_CREATE: true
 	});
 	conn.commit();
@@ -44,7 +44,7 @@ function createPostcode(postcode, conn) {
 /*************************************
  ----- Create Suburb					 
 *************************************/
-function createSuburb(suburb, conn){
+function createSuburb(suburb, conn) {
 	var fnFetchSuburb = conn.loadProcedure("sloc.db::fetchSuburb");
 	var result = fnFetchSuburb({
 		IM_SUBURB: suburb.suburb,
@@ -57,7 +57,7 @@ function createSuburb(suburb, conn){
 /*************************************
  ----- Create Street Address					 
 *************************************/
-function createStreetAddress(streetAddress, conn){
+function createStreetAddress(streetAddress, conn) {
 	var fnCreateStreetAddress = conn.loadProcedure("sloc.db::createSteetAddress");
 	var result = fnCreateStreetAddress({
 		IM_LEVEL: streetAddress.level,
@@ -66,12 +66,12 @@ function createStreetAddress(streetAddress, conn){
 		IM_STREET: streetAddress.street
 	});
 	conn.commit();
-	return result.EX_KEY;
+	return result.EX_KEY.toString();
 }
 /*************************************
  ----- Create Store Address					 
 *************************************/
-function createStoreAddress(storeAddress, conn){
+function createStoreAddress(storeAddress, conn) {
 	var fnCreateStoreAddress = conn.loadProcedure("sloc.db::createStoreAddress");
 	var result = fnCreateStoreAddress({
 		IM_STORE_NAME: storeAddress.storeName,
@@ -80,104 +80,164 @@ function createStoreAddress(storeAddress, conn){
 		IM_POSTCODE: storeAddress.postcode,
 		IM_STATE: storeAddress.state,
 		IM_REMARKS: storeAddress.remarks,
-		IM_LOCATION: storeAddress.loc
+		IM_LOGITUDE: storeAddress.longitude,
+		IM_LATITUDE: storeAddress.latitude
 	});
 	conn.commit();
 	return getOutput(result);
 }
 /*************************************
- ----- Data Construct					 
+ ----- Create Store					 
 *************************************/
-// var postcode = {
-// 	postcode: $.request.parameters.get("postcode"),
-// 	state: $.request.parameters.get("state")
-// };
-// var suburb = {
-// 	suburb: $.request.parameters.get("suburb"),
-// 	postcode: $.request.parameters.get("postcode")
-// };
-// var streetAddress = {
-// 	level: $.request.parameters.get("level"),
-// 	building: $.request.parameters.get("building"),
-// 	streetNo: $.request.parameters.get("streetno"),
-// 	street: $.request.parameters.get("street")
-// };
-// var storeAddress = {
-// 	storeName: $.request.parameters.get("storeName"),
-// 	streetId: "",
-// 	suburb: $.request.parameters.get("suburb"),
-// 	postcode: $.request.parameters.get("postcode"),
-// 	state: $.request.parameters.get("state"),
-// 	remarks: $.request.parameters.get("remarks"),
-// 	loc: $.request.parameters.get("location")
-// };
-
-
-/* JSON Body
-{
-  "state": {
-    "state": "VIC",
-    "state_name": "Victoria"
-  },
-  "postcode": 3136,
-  "suburb": "CROYDON",
-  "street": {
-    "streetName": "some street",
-    "streetNo": "45",
-    "building": "3",
-    "level": "2nd Floor"
-  },
-  "company": {
-    "company_code": "ABCGRP",
-    "company_name": "ABC Group"
-  },
-  "store": {
-    "store_name": "W999",
-    "geolocation": {
-      "longitude": 145.385059,
-      "latitude": -37.768459
-    },
-    "remarks": "this is a test record"
-  }
+function createStore(store, conn) {
+	var fnCreateStore = conn.loadProcedure("sloc.db::fetchStore");
+	var result = fnCreateStore({
+		IM_COMPANY_CODE: store.companyCode,
+		IM_STORE_NAME: store.name,
+		IM_CREATE: true
+	});
+	conn.commit();
+	return getOutput(result);
 }
-*/
-
-
-
+/*************************************
+ ----- Create Company					 
+*************************************/
+function createCompany(company, conn) {
+	var fnCreateCompany = conn.loadProcedure("sloc.db::fetchCompany");
+	var result = fnCreateCompany({
+		IM_COMPANY_CODE: company.companyCode,
+		IM_COMPANY_NAME: company.companyName,
+		IM_CREATE: true
+	});
+	conn.commit();
+	return getOutput(result);
+}
 /*************************************
  ----- Create Store with Address					 
 *************************************/
+function createNewStore(newstore, conn) {
+
+	var state = {
+		"state": newstore.state.state,
+		"state_name": newstore.state.state_name
+	};
+	createState(state, conn);
+
+	var postcode = {
+		"postcode": newstore.postcode,
+		"state": newstore.state.state
+	};
+	createPostcode(postcode, conn);
+
+	var suburb = {
+		"suburb": newstore.suburb,
+		"postcode": newstore.postcode
+	};
+	createSuburb(suburb, conn);
+
+	var company = {
+		"companyCode": newstore.company.company_code,
+		"companyName": newstore.company.company_name
+	};
+	createCompany(company, conn);
+
+	var store = {
+		"companyCode": newstore.company.company_code,
+		"name": newstore.store.store_name
+	};
+	createStore(store, conn);
+
+	var streetAddresss = {
+		"level": newstore.street.level,
+		"building": newstore.street.building,
+		"streetNo": newstore.street.streetNo,
+		"street": newstore.street.streetName
+	};
+	var streetId = createStreetAddress(streetAddresss, conn);
+
+	var storeAddress = {
+		"storeName": newstore.store.store_name,
+		"streetId": streetId,
+		"suburb": newstore.suburb,
+		"postcode": newstore.postcode,
+		"state": newstore.state.state,
+		"remarks": newstore.store.remarks,
+		"longitude": newstore.store.geolocation.longitude,
+		"latitude": newstore.store.geolocation.latitude
+	};
+	createStoreAddress(storeAddress, conn);
+}
+
+function start(data) {
+	var conn = $.hdb.getConnection();
+	for (var i = 0; i < data.storeData.length; i++) {
+		var newStore = data.storeData[i];
+		createNewStore(newStore, conn);
+	}
+	conn.close();
+}
 
 var body = $.request.body.asString();
-var newstore = JSON.parse(body);
+var data = JSON.parse(body);
+start(data);
+$.response.contentType = "application/text";
+$.response.setBody("Process Complete!");
 
-var postcode = {
-	"postcode": newstore.postcode,
-	"state": newstore.state
-};
-
-var suburb = {
-	"suburb": newstore.suburb,
-	"postcode": newstore.postcode
-};
-
-var state = {
-	"state": newstore.state.state,
-	"state_name": newstore.state.state_name
-};
-
-var conn = $.hdb.getConnection();
-
-
-createPostcode(postcode, conn);
-createSuburb(suburb, conn);
-createState(state, conn);
-
-// var streetId = createStreetAddress(streetAddress, conn);
-// storeAddress.storeAddress = streetId;
-// createStoreAddress(storeAddress, conn);
-
-// conn.close();
-
-// $.response.contentType = "application/json";
-// $.response.setBody(output);
+/* JSON Body
+{
+  "storeData": [
+    {
+      "state": {
+        "state": "VIC",
+        "state_name": "Victoria"
+      },
+      "postcode": 3136,
+      "suburb": "CROYDON",
+      "street": {
+        "streetName": "some street",
+        "streetNo": "45",
+        "building": "3",
+        "level": "2nd Floor"
+      },
+      "company": {
+        "company_code": "ABCGRP",
+        "company_name": "ABC Group"
+      },
+      "store": {
+        "store_name": "W999",
+        "geolocation": {
+          "longitude": "145.385059",
+          "latitude": "-37.768459"
+        },
+        "remarks": "this is a test record"
+      }
+    },
+    {
+      "state": {
+        "state": "VIC",
+        "state_name": "Victoria"
+      },
+      "postcode": 3136,
+      "suburb": "CROYDON",
+      "street": {
+        "streetName": "some street 999",
+        "streetNo": "258",
+        "building": "4",
+        "level": "1st Floor"
+      },
+      "company": {
+        "company_code": "ABCGRP",
+        "company_name": "ABC Group"
+      },
+      "store": {
+        "store_name": "W999",
+        "geolocation": {
+          "longitude": "145.385059",
+          "latitude": "-37.768459"
+        },
+        "remarks": "this is a test record"
+      }
+    }
+  ]
+}
+*/

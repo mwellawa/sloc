@@ -27,7 +27,7 @@ BEGIN
 	if v_count > 0 then
 		
 		select "company_code", "company_name"
-		into im_company_code, im_company_name 
+		into ex_company_code, ex_company_name 
 		from "sloc.db::model.Company"
 		where "company_code" = v_company_code;		
 		
@@ -43,7 +43,7 @@ BEGIN
 			if v_count > 0 then
 				
 				select "company_code", "company_name"
-				into im_company_code, im_company_name 
+				into ex_company_code, ex_company_name 
 				from "sloc.db::model.Company"
 				where "company_code" = v_company_code;				
 				

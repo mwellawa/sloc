@@ -36,7 +36,7 @@ BEGIN
 		
 		else
 		
-			if :im_create = true then
+			if im_create = true then
 				
 				insert into "sloc.db::model.Postcode" 
 				values(im_postcode, im_state);
