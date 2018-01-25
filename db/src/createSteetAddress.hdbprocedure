@@ -2,7 +2,7 @@ PROCEDURE "sloc.db::createSteetAddress" (
 	in	im_level		nvarchar(20),
 	in	im_building		nvarchar(15),
 	in	im_street_no	nvarchar(30),
-	in	im_street		nvarchar(50),
+	in	im_street		nvarchar(100),
 	out	ex_key			bigint
 )
    LANGUAGE SQLSCRIPT

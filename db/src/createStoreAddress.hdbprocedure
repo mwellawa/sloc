@@ -1,13 +1,13 @@
 PROCEDURE "sloc.db::createStoreAddress" ( 
-	in	im_store_name	nvarchar(35),
+	in	im_store_id		nvarchar(10),
 	in	im_street_id	integer,
 	in	im_suburb		nvarchar(50),
 	in	im_postcode		nvarchar(4),
 	in	im_state		nvarchar(3),
-	in	im_remarks		nvarchar(30),
+	in	im_remarks		nvarchar(125),
 	in	im_logitude		nvarchar(35),
 	in	im_latitude		nvarchar(35),
-	out ex_store_name	nvarchar(35),
+	out ex_store_id		nvarchar(10),
 	out	ex_street_id	integer,
 	out	ex_error		nvarchar(100)
 )
@@ -23,7 +23,6 @@ BEGIN
 	/*declare v_loc_point ST_GEOMETRY;
 	v_loc_point = st_geomfromtext(im_location,'4326');*/
 	
-	
 	declare v_count integer;
 	declare v_point ST_GEOMETRY;
 	declare v_ponit_text varchar(100);
@@ -31,24 +30,23 @@ BEGIN
 	v_ponit_text = 'Point(' || im_logitude || ' ' || im_latitude || ')';
 	v_point = st_geomfromtext(v_ponit_text,'4326');
 		
-	insert into "sloc.db::model.StoreAddress" values(im_store_name, im_street_id, im_suburb, im_postcode, im_state, im_remarks, im_logitude, im_latitude, v_point);
+	insert into "sloc.db::model.StoreAddress" values(im_store_id, im_street_id, im_suburb, im_postcode, im_state, im_remarks, im_logitude, im_latitude, v_point);
 	
 	select count(*)
 	into v_count
 	from "sloc.db::model.StoreAddress"
-	where "store_name.store_name" = im_store_name and
+	where "store_id.store_id" = im_store_id and
 		  "street_id.id" = im_street_id;
 	if v_count > 0 then
 		
-		select "store_name.store_name", "street_id.id"
-		into ex_store_name, ex_street_id
+		select "store_id.store_id", "street_id.id"
+		into ex_store_id, ex_street_id
 		from "sloc.db::model.StoreAddress"
-		where "store_name.store_name" = im_store_name and
-			  "street_id.id" = im_street_id;		
+		where "store_id.store_id" = im_store_id and
+			  "street_id.id" = im_street_id;
 		
 	else
-		ex_error = 'error inserting store address for store ' || im_store_name || ' and street id ' || im_street_id;
+		ex_error = 'error inserting store address for store ' || im_store_id || ' and street id ' || im_street_id;
 	end if;
 	
-   
 END

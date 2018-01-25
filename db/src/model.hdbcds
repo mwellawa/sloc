@@ -10,22 +10,24 @@ context model {
 
     /*@@layout{"layoutInfo":{"x":-396,"y":-240}}*/
     entity Store {
-        key store_name   : String(35);
+        key store_id     : String(10);
+            store_name   : String(35);
             company_code : association[*, 1..1] to Company { company_code };
     }
 
     /*@@layout{"layoutInfo":{"x":-105,"y":-150}}*/
     entity StoreAddress {
-        key store_name   : association[*, 1..1] to Store { store_name };
+        key store_id     : association[*, 1..1] to Store { store_id };
         key street_id    : association[*, 1..1] to StreetAddress { id };
             suburb       : association[*, 1..1] to Suburb { suburb };
             postcode     : association[*, 1..1] to Postcode { postcode };
             state        : association[*, 1..1] to State { state };
-            addr_remarks : String(30);
+            addr_remarks : String(125);
             logitude     : String(35);
             latitude     : String(35);
             location     : hana.ST_POINT(4326);
     };
+
 
     /*@@layout{"layoutInfo":{"x":-396,"y":-47}}*/
     entity StreetAddress {
@@ -33,7 +35,7 @@ context model {
             level     : String(20);
             building  : String(15);
             street_no : String(30);
-            street    : String(50);
+            street    : String(100);
     };
 
     /*@@layout{"layoutInfo":{"x":199,"y":-107.5}}*/

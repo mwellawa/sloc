@@ -1,8 +1,10 @@
 PROCEDURE "sloc.db::fetchStore" ( 
 	in	im_company_code		nvarchar(15),
+	in	im_store_id			nvarchar(10),
 	in	im_store_name		nvarchar(35),
 	in	im_create			boolean,
 	out	ex_company_code		nvarchar(15),
+	out ex_store_id			nvarchar(10),
 	out ex_store_name		nvarchar(35),
 	out ex_error			nvarchar(100)
 )
@@ -14,11 +16,7 @@ BEGIN
    /*************************************
        Write your procedure logic 
    *************************************/
-   
-   declare v_count integer;
-   declare v_store_name varchar(15);
-   
-   v_store_name = upper(im_store_name);
+	declare v_count integer;
    
 	select count(*) 
 	into v_count 
@@ -29,43 +27,47 @@ BEGIN
 		select count(*) 
 		into v_count 
 		from "sloc.db::model.Store"
-		where "store_name" = v_store_name and
-			  "company_code.company_code" = im_company_code;
+		where	"store_id" = im_store_id and 
+				"store_name" = im_store_name and
+				"company_code.company_code" = im_company_code;
 		if v_count > 0 then
 			
-			select "store_name", "company_code.company_code" 
-			into ex_store_name, ex_company_code
+			select "store_id", "store_name", "company_code.company_code" 
+			into ex_store_id, ex_store_name, ex_company_code
 			from "sloc.db::model.Store"
-			where "store_name" = v_store_name and
-				  "company_code.company_code" = im_company_code;			
+			where	"store_id" = im_store_id and 
+					"store_name" = im_store_name and
+					"company_code.company_code" = im_company_code;
 			
 		else
 			
 			if im_create = true then
 			
-				insert into "sloc.db::model.Store" values(v_store_name, im_company_code);
+				insert into "sloc.db::model.Store" values(im_store_id, im_store_name, im_company_code);
 				select count(*) 
 				into v_count 
 				from "sloc.db::model.Store"
-				where "store_name" = v_store_name and
-					  "company_code.company_code" = im_company_code;
+				where	"store_id" = im_store_id and 
+						"store_name" = im_store_name and
+						"company_code.company_code" = im_company_code;
 				if v_count > 0 then
 					
-					select "store_name", "company_code.company_code" 
-					into ex_store_name, ex_company_code
+					select "store_id", "store_name", "company_code.company_code" 
+					into ex_store_id, ex_store_name, ex_company_code
 					from "sloc.db::model.Store"
-					where "store_name" = v_store_name and
-						  "company_code.company_code" = im_company_code;
+					where	"store_id" = im_store_id and 
+							"store_name" = im_store_name and
+							"company_code.company_code" = im_company_code;
 						  
 				else
-					ex_error = 'error inserting store ' || v_store_name || ' for company code ' || im_company_code;
+					ex_error = 'error inserting store ' || im_store_name || ' for company code ' || im_company_code;
 				end if;
 			else
-				ex_error = 'store ' || v_store_name || ' not found for company code ' || im_company_code;
+				ex_error = 'store ' || im_store_name || ' not found for company code ' || im_company_code;
 			end if;
 		end if;
 	else
 		ex_error = 'invalid company code ' || im_company_code;
-	end if;   
+	end if;
    
 END

@@ -74,7 +74,7 @@ function createStreetAddress(streetAddress, conn) {
 function createStoreAddress(storeAddress, conn) {
 	var fnCreateStoreAddress = conn.loadProcedure("sloc.db::createStoreAddress");
 	var result = fnCreateStoreAddress({
-		IM_STORE_NAME: storeAddress.storeName,
+		IM_STORE_ID: storeAddress.storeId,
 		IM_STREET_ID: storeAddress.streetId,
 		IM_SUBURB: storeAddress.suburb,
 		IM_POSTCODE: storeAddress.postcode,
@@ -93,6 +93,7 @@ function createStore(store, conn) {
 	var fnCreateStore = conn.loadProcedure("sloc.db::fetchStore");
 	var result = fnCreateStore({
 		IM_COMPANY_CODE: store.companyCode,
+		IM_STORE_ID: store.id,
 		IM_STORE_NAME: store.name,
 		IM_CREATE: true
 	});
@@ -143,6 +144,7 @@ function createNewStore(newstore, conn) {
 
 	var store = {
 		"companyCode": newstore.company.company_code,
+		"id": newstore.store.id,
 		"name": newstore.store.store_name
 	};
 	createStore(store, conn);
@@ -156,7 +158,7 @@ function createNewStore(newstore, conn) {
 	var streetId = createStreetAddress(streetAddresss, conn);
 
 	var storeAddress = {
-		"storeName": newstore.store.store_name,
+		"storeId": newstore.store.id,
 		"streetId": streetId,
 		"suburb": newstore.suburb,
 		"postcode": newstore.postcode,
@@ -168,10 +170,60 @@ function createNewStore(newstore, conn) {
 	createStoreAddress(storeAddress, conn);
 }
 
+function mapNewStore(record) {
+
+	var newstore = {
+		state: {
+			state: "",
+			state_name: ""
+		},
+		postcode: "",
+		suburb: "",
+		street: {
+			streetName: "",
+			streetNo: "",
+			building: "",
+			level: ""
+		},
+		company: {
+			company_code: "ABCGRP",
+			company_name: "ABC Group"
+		},
+		store: {
+			store_name: "",
+			geolocation: {
+				longitude: "",
+				latitude: ""
+			},
+			remarks: ""
+		}
+	};
+
+
+	newstore.state.state = record.state;
+	newstore.state.state_name = "";
+	newstore.postcode = record.zip_code;
+	newstore.suburb = record.city;
+	newstore.company.company_code = "OW";
+	newstore.company.company_name = "Officeworks";
+	newstore.store.id = record.id;
+	newstore.store.store_name = record.name;
+	newstore.store.remarks = record.full_address;
+	newstore.street.level = "";
+	newstore.street.building = "";
+	newstore.street.streetNo = "";
+	newstore.street.streetName = record.address;
+	newstore.store.geolocation.longitude = record.longitude;
+	newstore.store.geolocation.latitude = record.latitude;
+	
+	return newstore;
+}
+
 function start(data) {
 	var conn = $.hdb.getConnection();
-	for (var i = 0; i < data.storeData.length; i++) {
-		var newStore = data.storeData[i];
+	for (var i = 0; i < data.length; i++) {
+		var newStore = mapNewStore(data[i]);
+		//var newStore = data.storeData[i];
 		createNewStore(newStore, conn);
 	}
 	conn.close();
