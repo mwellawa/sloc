@@ -35,7 +35,7 @@ function createPostcode(postcode, conn) {
 	var fnFetchPostcode = conn.loadProcedure("sloc.db::fetchPostcode");
 	var result = fnFetchPostcode({
 		IM_POSTCODE: postcode.postcode,
-		IM_STATE: postcode.state.state,
+		IM_STATE: postcode.state,
 		IM_CREATE: true
 	});
 	conn.commit();
@@ -202,7 +202,7 @@ function mapNewStore(record) {
 
 	newstore.state.state = record.state;
 	newstore.state.state_name = "";
-	newstore.postcode = record.zip_code;
+	newstore.postcode = record.zip_code.toString();
 	newstore.suburb = record.city;
 	newstore.company.company_code = "OW";
 	newstore.company.company_name = "Officeworks";
