@@ -1,5 +1,5 @@
 PROCEDURE "sloc.db::fetchCompany" ( 
-	in	im_company_code		nvarchar(15),
+	in	im_company_code		nvarchar(4),
 	in	im_company_name		nvarchar(45),
 	in	im_create			boolean,
 	out	ex_company_code		nvarchar(15),
@@ -14,9 +14,8 @@ BEGIN
    /*************************************
        Write your procedure logic 
    *************************************/
-   
 	declare v_count integer;
-	declare v_company_code varchar(15);
+	declare v_company_code varchar(4);
    
 	v_company_code = upper(im_company_code);
 	
@@ -55,5 +54,5 @@ BEGIN
 		end if;
 	
 	end if;
-   
+
 END

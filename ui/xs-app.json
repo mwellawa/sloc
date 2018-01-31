@@ -1,5 +1,8 @@
 {
-	"welcomeFile": "webapp/index.html",
+	"welcomeFile": "index.html",
 	"authenticationMethod": "none",
-	"routes": []
+	"routes": [{
+		"source": "^(.*)/storeloc.xsodata/(.*)$",
+		"destination": "slocjs_be"
+	}]
 }

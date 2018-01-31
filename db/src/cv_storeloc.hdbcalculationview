@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Calculation:scenario xmlns:Calculation="http://www.sap.com/ndb/BiModelCalculation.ecore" id="sloc.db::cv_storeloc" applyPrivilegeType="NONE" dataCategory="DIMENSION" dimensionType="STANDARD" schemaVersion="3.0" outputViewType="Projection" cacheInvalidationPeriod="NONE" enforceSqlExecution="false">
+<descriptions defaultDescription="storeloc"/>
+<localVariables>
+  <variable id="in_longitude" parameter="true">
+    <descriptions defaultDescription="in_longitude"/>
+    <variableProperties datatype="NVARCHAR" length="35" mandatory="true">
+      <valueDomain type="empty"/>
+      <selection multiLine="false" type="Single"/>
+    </variableProperties>
+  </variable>
+  <variable id="in_latitude" parameter="true">
+    <descriptions defaultDescription="in_latitude"/>
+    <variableProperties datatype="NVARCHAR" length="35" mandatory="true">
+      <valueDomain type="empty"/>
+      <selection multiLine="false" type="Single"/>
+    </variableProperties>
+  </variable>
+</localVariables>
+<variableMappings/>
+<dataSources>
+  <DataSource id="sloc.db::model.StoreAddress">
+    <resourceUri>sloc.db::model.StoreAddress</resourceUri>
+  </DataSource>
+</dataSources>
+<calculationViews/>
+<logicalModel id="sloc.db::model.StoreAddress">
+  <attributes>
+    <attribute id="id" order="1" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="id"/>
+      <keyMapping columnObjectName="model.StoreAddress" columnName="id"/>
+    </attribute>
+    <attribute id="state_state" order="2" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="state_state"/>
+      <keyMapping columnObjectName="model.StoreAddress" columnName="state.state"/>
+    </attribute>
+    <attribute id="postcode_postcode" order="3" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="postcode_postcode"/>
+      <keyMapping columnObjectName="model.StoreAddress" columnName="postcode.postcode"/>
+    </attribute>
+    <attribute id="suburb_suburb" order="4" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="suburb_suburb"/>
+      <keyMapping columnObjectName="model.StoreAddress" columnName="suburb.suburb"/>
+    </attribute>
+    <attribute id="logitude" order="5" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="logitude"/>
+      <keyMapping columnObjectName="model.StoreAddress" columnName="logitude"/>
+    </attribute>
+    <attribute id="latitude" order="6" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="latitude"/>
+      <keyMapping columnObjectName="model.StoreAddress" columnName="latitude"/>
+    </attribute>
+  </attributes>
+  <calculatedAttributes>
+    <calculatedAttribute id="storeloc" order="7" semanticType="empty" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="Store Location"/>
+      <keyCalculation datatype="ST_GEOMETRY" expressionLanguage="COLUMN_ENGINE">
+        <formula>ST_GeomFromText('Point(' + &quot;logitude&quot; + ' ' + &quot;latitude&quot; + ')',4326)</formula>
+      </keyCalculation>
+      </calculatedAttribute>
+    <calculatedAttribute id="o_longitude" order="8" semanticType="empty" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="o_longitude"/>
+      <keyCalculation datatype="NVARCHAR" expressionLanguage="COLUMN_ENGINE" length="35">
+        <formula>'$$in_longitude$$'</formula>
+      </keyCalculation>
+      </calculatedAttribute>
+    <calculatedAttribute id="o_latitude" order="9" semanticType="empty" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="o_latitude"/>
+      <keyCalculation datatype="NVARCHAR" expressionLanguage="COLUMN_ENGINE" length="35">
+        <formula>'$$in_latitude$$'</formula>
+      </keyCalculation>
+      </calculatedAttribute>
+  
+    <calculatedAttribute id="originloc" order="10" semanticType="empty" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="originloc"/>
+      <keyCalculation datatype="ST_GEOMETRY" expressionLanguage="COLUMN_ENGINE">
+        <formula>ST_GeomFromText('Point(' + &quot;o_longitude&quot; + ' ' + &quot;o_latitude&quot; + ')',4326)</formula>
+      </keyCalculation>
+      </calculatedAttribute>
+    <calculatedAttribute id="distance" order="11" semanticType="empty" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="distance"/>
+      <keyCalculation datatype="DOUBLE" expressionLanguage="COLUMN_ENGINE">
+        <formula>ST_Distance(&quot;originloc&quot;,&quot;storeloc&quot;)</formula>
+      </keyCalculation>
+      </calculatedAttribute>
+  </calculatedAttributes>
+  <baseMeasures/>
+  <calculatedMeasures/>
+  <restrictedMeasures/>
+</logicalModel>
+<layout>
+  <shapes>
+    <shape expanded="true" modelObjectName="Output" modelObjectNameSpace="MeasureGroup">
+      <upperLeftCorner x="40" y="85"/>
+    </shape>
+  </shapes>
+</layout>
+</Calculation:scenario>

@@ -1,20 +1,20 @@
 /*************************************
  ----- Get Output					 
 *************************************/
-function getOutput(result) {
-	var output = {
-		returnCode: 0,
-		message: ""
-	};
-	if (result.EX_ERROR === null) {
-		output.returnCode = 0;
-		return output;
-	} else {
-		output.returnCode = 9;
-		output.message = result.EX_ERROR;
-		return output;
-	}
-}
+// function getOutput(result) {
+// 	var output = {
+// 		returnCode: 0,
+// 		message: ""
+// 	};
+// 	if (result.EX_ERROR === null) {
+// 		output.returnCode = 0;
+// 		return output;
+// 	} else {
+// 		output.returnCode = 9;
+// 		output.message = result.EX_ERROR;
+// 		return output;
+// 	}
+// }
 /*************************************
  ----- Create State					 
 *************************************/
@@ -23,10 +23,10 @@ function createState(state, conn) {
 	var result = fnFetchPostcode({
 		IM_STATE: state.state,
 		IM_STATE_NAME: state.state_name,
-		IM_CREATE: true
+		IM_CREATE: state.create
 	});
 	conn.commit();
-	return getOutput(result);
+	return result.EX_ERROR;
 }
 /*************************************
  ----- Create Postcode					 
@@ -36,10 +36,10 @@ function createPostcode(postcode, conn) {
 	var result = fnFetchPostcode({
 		IM_POSTCODE: postcode.postcode,
 		IM_STATE: postcode.state,
-		IM_CREATE: true
+		IM_CREATE: postcode.create
 	});
 	conn.commit();
-	return getOutput(result);
+	return result.EX_ERROR;
 }
 /*************************************
  ----- Create Suburb					 
@@ -49,10 +49,37 @@ function createSuburb(suburb, conn) {
 	var result = fnFetchSuburb({
 		IM_SUBURB: suburb.suburb,
 		IM_POSTCODE: suburb.postcode,
-		IM_CREATE: true
+		IM_CREATE: suburb.create
 	});
 	conn.commit();
-	return getOutput(result);
+	return result.EX_ERROR;
+}
+/*************************************
+ ----- Create Store					 
+*************************************/
+function createStore(store, conn) {
+	var fnCreateStore = conn.loadProcedure("sloc.db::fetchStore");
+	var result = fnCreateStore({
+		IM_COMPANY_CODE: store.companyCode,
+		IM_STORE_ID: store.id,
+		IM_STORE_NAME: store.name,
+		IM_CREATE: store.create
+	});
+	conn.commit();
+	return result.EX_ERROR;
+}
+/*************************************
+ ----- Create Company					 
+*************************************/
+function createCompany(company, conn) {
+	var fnCreateCompany = conn.loadProcedure("sloc.db::fetchCompany");
+	var result = fnCreateCompany({
+		IM_COMPANY_CODE: company.companyCode,
+		IM_COMPANY_NAME: company.companyName,
+		IM_CREATE: company.create
+	});
+	conn.commit();
+	return result.EX_ERROR;
 }
 /*************************************
  ----- Create Street Address					 
@@ -74,6 +101,7 @@ function createStreetAddress(streetAddress, conn) {
 function createStoreAddress(storeAddress, conn) {
 	var fnCreateStoreAddress = conn.loadProcedure("sloc.db::createStoreAddress");
 	var result = fnCreateStoreAddress({
+		IM_COMPANY_CODE: storeAddress.companyCode,
 		IM_STORE_ID: storeAddress.storeId,
 		IM_STREET_ID: storeAddress.streetId,
 		IM_SUBURB: storeAddress.suburb,
@@ -84,34 +112,13 @@ function createStoreAddress(storeAddress, conn) {
 		IM_LATITUDE: storeAddress.latitude
 	});
 	conn.commit();
-	return getOutput(result);
-}
-/*************************************
- ----- Create Store					 
-*************************************/
-function createStore(store, conn) {
-	var fnCreateStore = conn.loadProcedure("sloc.db::fetchStore");
-	var result = fnCreateStore({
-		IM_COMPANY_CODE: store.companyCode,
-		IM_STORE_ID: store.id,
-		IM_STORE_NAME: store.name,
-		IM_CREATE: true
-	});
-	conn.commit();
-	return getOutput(result);
-}
-/*************************************
- ----- Create Company					 
-*************************************/
-function createCompany(company, conn) {
-	var fnCreateCompany = conn.loadProcedure("sloc.db::fetchCompany");
-	var result = fnCreateCompany({
-		IM_COMPANY_CODE: company.companyCode,
-		IM_COMPANY_NAME: company.companyName,
-		IM_CREATE: true
-	});
-	conn.commit();
-	return getOutput(result);
+	var ret;
+	if (result.EX_KEY !== null) {
+		ret = result.EX_KEY;
+	} else {
+		ret = result.EX_ERROR;
+	}
+	return ret;
 }
 /*************************************
  ----- Create Store with Address					 
@@ -120,32 +127,37 @@ function createNewStore(newstore, conn) {
 
 	var state = {
 		"state": newstore.state.state,
-		"state_name": newstore.state.state_name
+		"state_name": newstore.state.state_name,
+		"create": true
 	};
-	createState(state, conn);
+	newstore.state.error = createState(state, conn);
 
 	var postcode = {
 		"postcode": newstore.postcode,
-		"state": newstore.state.state
+		"state": newstore.state.state,
+		"create": true
 	};
 	createPostcode(postcode, conn);
 
 	var suburb = {
 		"suburb": newstore.suburb,
-		"postcode": newstore.postcode
+		"postcode": newstore.postcode,
+		"create": true
 	};
 	createSuburb(suburb, conn);
 
 	var company = {
 		"companyCode": newstore.company.company_code,
-		"companyName": newstore.company.company_name
+		"companyName": newstore.company.company_name,
+		"create": true
 	};
 	createCompany(company, conn);
 
 	var store = {
 		"companyCode": newstore.company.company_code,
 		"id": newstore.store.id,
-		"name": newstore.store.store_name
+		"name": newstore.store.store_name,
+		"create": true
 	};
 	createStore(store, conn);
 
@@ -158,6 +170,7 @@ function createNewStore(newstore, conn) {
 	var streetId = createStreetAddress(streetAddresss, conn);
 
 	var storeAddress = {
+		"companyCode": newstore.company.company_code,
 		"storeId": newstore.store.id,
 		"streetId": streetId,
 		"suburb": newstore.suburb,
@@ -167,7 +180,8 @@ function createNewStore(newstore, conn) {
 		"longitude": newstore.store.geolocation.longitude,
 		"latitude": newstore.store.geolocation.latitude
 	};
-	createStoreAddress(storeAddress, conn);
+	var createdNewStore = createStoreAddress(storeAddress, conn);
+	return createdNewStore;
 }
 
 function mapNewStore(record) {
@@ -190,6 +204,7 @@ function mapNewStore(record) {
 			company_name: "ABC Group"
 		},
 		store: {
+			id: "",
 			store_name: "",
 			geolocation: {
 				longitude: "",
@@ -198,7 +213,6 @@ function mapNewStore(record) {
 			remarks: ""
 		}
 	};
-
 
 	newstore.state.state = record.state;
 	newstore.state.state_name = "";
@@ -215,25 +229,33 @@ function mapNewStore(record) {
 	newstore.street.streetName = record.address;
 	newstore.store.geolocation.longitude = record.longitude;
 	newstore.store.geolocation.latitude = record.latitude;
-	
+
 	return newstore;
 }
 
 function start(data) {
 	var conn = $.hdb.getConnection();
+	var newStores = [];
 	for (var i = 0; i < data.length; i++) {
+		var newStoreData = {};
 		var newStore = mapNewStore(data[i]);
-		//var newStore = data.storeData[i];
-		createNewStore(newStore, conn);
+		newStoreData.in = newStore;
+		var createdStore = createNewStore(newStore, conn);
+		newStoreData.out = createdStore;
+		newStores.push(newStoreData);
 	}
 	conn.close();
+	return newStores;
 }
 
 var body = $.request.body.asString();
 var data = JSON.parse(body);
-start(data);
-$.response.contentType = "application/text";
-$.response.setBody("Process Complete!");
+
+var newStores = {};
+newStores.createdStores = start(data);
+$.response.contentType = "application/json";
+body = JSON.stringify(newStores);
+$.response.setBody(body);
 
 /* JSON Body
 {

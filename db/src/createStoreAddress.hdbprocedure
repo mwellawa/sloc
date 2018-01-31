@@ -1,4 +1,5 @@
-PROCEDURE "sloc.db::createStoreAddress" ( 
+PROCEDURE "sloc.db::createStoreAddress" (
+	in	im_company_code nvarchar(10),
 	in	im_store_id		nvarchar(10),
 	in	im_street_id	integer,
 	in	im_suburb		nvarchar(50),
@@ -7,8 +8,7 @@ PROCEDURE "sloc.db::createStoreAddress" (
 	in	im_remarks		nvarchar(125),
 	in	im_logitude		nvarchar(35),
 	in	im_latitude		nvarchar(35),
-	out ex_store_id		nvarchar(10),
-	out	ex_street_id	integer,
+	out ex_key			integer,
 	out	ex_error		nvarchar(100)
 )
    LANGUAGE SQLSCRIPT
@@ -19,34 +19,82 @@ BEGIN
    /*************************************
        Write your procedure logic 
    *************************************/
-   
-	/*declare v_loc_point ST_GEOMETRY;
-	v_loc_point = st_geomfromtext(im_location,'4326');*/
-	
 	declare v_count integer;
-	declare v_point ST_GEOMETRY;
-	declare v_ponit_text varchar(100);
+	declare v_company_code varchar(4);
+	declare v_store_id varchar(10);
+	declare v_state varchar(3);
+	declare v_suburb varchar(50);
 	
-	v_ponit_text = 'Point(' || im_logitude || ' ' || im_latitude || ')';
-	v_point = st_geomfromtext(v_ponit_text,'4326');
-		
-	insert into "sloc.db::model.StoreAddress" values(im_store_id, im_street_id, im_suburb, im_postcode, im_state, im_remarks, im_logitude, im_latitude, v_point);
+	v_company_code = upper(im_company_code);
+	v_store_id = upper(im_store_id);
+	v_state = upper(im_state);
+	v_suburb = upper(im_suburb);
 	
+	/* check if company code is valid*/
 	select count(*)
 	into v_count
-	from "sloc.db::model.StoreAddress"
-	where "store_id.store_id" = im_store_id and
-		  "street_id.id" = im_street_id;
+	from "sloc.db::model.Company"
+	where "company_code" = v_company_code;   
 	if v_count > 0 then
 		
-		select "store_id.store_id", "street_id.id"
-		into ex_store_id, ex_street_id
-		from "sloc.db::model.StoreAddress"
-		where "store_id.store_id" = im_store_id and
-			  "street_id.id" = im_street_id;
-		
+		/* check if store is valid */
+		select count(*)
+		into v_count
+		from "sloc.db::model.Store"
+		where "company_code.company_code" = v_company_code and
+			  "store_id" = v_store_id;
+		if v_count > 0 then
+			
+			/* check if state is valid */
+			select count(*) 
+			into v_count 
+			from "sloc.db::model.State"
+			where "state" = v_state;	
+			if v_count > 0 then
+				
+				/* check if postcode valid */
+				select count(*) 
+				into v_count 
+				from "sloc.db::model.Postcode"
+				where "postcode" = im_postcode and 
+					  "state.state" = v_state;
+				if v_count > 0 then
+					
+					/* check if suburb is valid */
+					select count(*) 
+					into v_count 
+					from "sloc.db::model.Suburb"
+					where "suburb" = v_suburb and 
+						  "postcode.postcode" = im_postcode;
+					if v_count > 0 then
+						
+						/* insert store address */
+						INSERT INTO "sloc.db::model.StoreAddress" 
+							VALUES(
+								v_company_code, 
+								v_store_id, 
+								im_street_id, 
+								v_suburb, 
+								im_postcode, 
+								v_state, 
+								im_remarks, 
+								im_logitude, 
+								im_latitude);
+						ex_key = current_identity_value( );
+					else
+						ex_error = 'invalid suburb ' || v_suburb;
+					end if;
+				else
+					ex_error = 'invalid postcode ' || im_postcode;
+				end if;
+			else
+				ex_error = 'invalid state ' || v_state;
+			end if;
+		else
+			ex_error = 'invalid store ' || v_store_id;
+		end if;
 	else
-		ex_error = 'error inserting store address for store ' || im_store_id || ' and street id ' || im_street_id;
+		ex_error = 'invalid company code ' || v_company_code;
 	end if;
 	
 END

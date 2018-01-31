@@ -2,34 +2,34 @@ namespace sloc.db;
 
 context model {
 
-    /*@@layout{"layoutInfo":{"x":-93,"y":-290}}*/
+    /*@@layout{"layoutInfo":{"x":-401,"y":-196}}*/
     entity Company {
-        key company_code : String(15);
+        key company_code : String(4);
             company_name : String(45);
     }
 
-    /*@@layout{"layoutInfo":{"x":-396,"y":-240}}*/
+    /*@@layout{"layoutInfo":{"x":-401,"y":-103}}*/
     entity Store {
+        key company_code : association[*, 1..1] to Company { company_code };
         key store_id     : String(10);
             store_name   : String(35);
-            company_code : association[*, 1..1] to Company { company_code };
     }
 
     /*@@layout{"layoutInfo":{"x":-105,"y":-150}}*/
     entity StoreAddress {
-        key store_id     : association[*, 1..1] to Store { store_id };
-        key street_id    : association[*, 1..1] to StreetAddress { id };
+        key id           : Integer generated always as identity(start with 1000000 increment by 1 minvalue 1000000 maxvalue 9999999);
+            company      : association[*, 1..1] to Company { company_code };
+            store        : association[*, 1..1] to Store { store_id };
+            street_id    : association[*, 1..1] to StreetAddress { id };
             suburb       : association[*, 1..1] to Suburb { suburb };
             postcode     : association[*, 1..1] to Postcode { postcode };
             state        : association[*, 1..1] to State { state };
             addr_remarks : String(125);
             logitude     : String(35);
             latitude     : String(35);
-            location     : hana.ST_POINT(4326);
     };
 
-
-    /*@@layout{"layoutInfo":{"x":-396,"y":-47}}*/
+    /*@@layout{"layoutInfo":{"x":-401,"y":17}}*/
     entity StreetAddress {
         key id        : Integer generated always as identity(start with 100000 increment by 1 minvalue 100000 no maxvalue);
             level     : String(20);
@@ -38,21 +38,21 @@ context model {
             street    : String(100);
     };
 
-    /*@@layout{"layoutInfo":{"x":199,"y":-107.5}}*/
+    /*@@layout{"layoutInfo":{"x":229,"y":-89.5}}*/
     entity Postcode {
-        key postcode : String(4);
+        key postcode : String(4) not null;
             state    : association[*, 1..1] to State { state };
     };
 
     /*@@layout{"layoutInfo":{"x":192,"y":-240.5}}*/
     entity Suburb {
-        key suburb   : String(50);
+        key suburb   : String(50) not null;
         key postcode : association[*, 1..1] to Postcode { postcode };
     };
 
-    /*@@layout{"layoutInfo":{"x":192,"y":-16.5}}*/
+    /*@@layout{"layoutInfo":{"x":199,"y":33.5}}*/
     entity State {
-        key state      : String(3);
+        key state      : String(3) not null;
             state_name : String(30);
     };
 };
