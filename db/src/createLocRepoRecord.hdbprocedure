@@ -1,0 +1,26 @@
+PROCEDURE "sloc.db::createLocRepoRecord" ( 
+	in	im_postcode		nvarchar(4),
+	in	im_locality		nvarchar(50),
+	in	im_state		nvarchar(3),
+	in	im_longitude	nvarchar(35),
+	in	im_latitude		nvarchar(35),
+	out	ex_key			integer			
+)
+   LANGUAGE SQLSCRIPT
+   SQL SECURITY INVOKER AS
+   --DEFAULT SCHEMA <default_schema_name>
+   --READS SQL DATA AS
+BEGIN
+   /*************************************
+       Write your procedure logic 
+   *************************************/
+   
+	INSERT INTO "sloc.db::model.LocRepo" VALUES(
+		im_postcode,
+		im_locality,
+		im_state,
+		im_longitude,
+		im_latitude	);
+	ex_key = current_identity_value( );
+   
+END

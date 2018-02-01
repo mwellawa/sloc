@@ -55,4 +55,13 @@ context model {
         key state      : String(3) not null;
             state_name : String(30);
     };
+
+    entity LocRepo {
+        key id        : Integer generated always as identity(start with 10000 increment by 1 minvalue 10000 no maxvalue);
+            postcode  : String(4)  not null;
+            locality  : String(50) not null;
+            state     : String(3)  not null;
+            longitude : String(35) not null;
+            latitude  : String(35) not null;
+    };
 };

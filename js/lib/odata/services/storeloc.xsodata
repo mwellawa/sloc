@@ -11,5 +11,7 @@ service namespace "sloc.data" {
 	"sloc.db::model.Postcode" as "Postcode" key ("postcode");
 	"sloc.db::model.Suburb" as "Suburb" key ("suburb");
 	
+	"sloc.db::model.LocRepo" as "LocRepo" key ("id");
+	
 }
 
