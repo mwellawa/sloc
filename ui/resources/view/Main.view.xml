@@ -2,66 +2,18 @@
 	xmlns:l="sap.ui.layout" controllerName="slocui.controller.Main" displayBlock="true">
 	<App>
 		<pages>
-			<Page title="{i18n>title}" id="mainPage">
-				<!--<headerContent>-->
-				<!--<Button icon="sap-icon://action" tooltip="Share"/>-->
-				<!--</headerContent>-->
-				<!--<subHeader>-->
-				<!--<Toolbar>-->
-				<!--	<SearchField/>-->
-				<!--</Toolbar>-->
-				<!--</subHeader>-->
+			<Page title="{i18n>title}" id="mainPage" enableScrolling="false">
 				<content>
-					<l:FixFlex class="fixFlexVertical">
-						<l:fixContent>
-							<html:div id="gmaps1"></html:div>
-						</l:fixContent>
-						<l:flexContent>
-							<ComboBox items="{/Suburb}">
-								<core:Item key="{suburb}" text="{suburb}"/>
-							</ComboBox>
-						</l:flexContent>
-					</l:FixFlex>
+					<l:VerticalLayout id="vlay1" class="sapUiResponsiveContentPadding" width="100%">
+						<SearchField id="searchField" showMagnifier="true" width="100%" placeholder="Search for Suburb" enableSuggestions="true" search="onSearch"
+							suggest="onSuggest" suggestionItems="{ path: '/LocRepo', sorter: { path: 'locality' } }">
+							<suggestionItems>
+								<SuggestionItem text="{locality} {postcode} {state}" key="{id}"/>
+							</suggestionItems>
+						</SearchField>
+						<html:div id="gmaps1"></html:div>
+					</l:VerticalLayout>
 				</content>
-				<!--<footer>-->
-				<!--<Toolbar>-->
-				<!--	<ToolbarSpacer/>-->
-				<!--	<Button text="Accept" type="Accept"/>-->
-				<!--	<Button text="Reject" type="Reject"/>-->
-				<!--	<Button text="Edit"/>-->
-				<!--	<Button text="Delete"/>-->
-				<!--</Toolbar>-->
-				<!--</footer>-->
-				<!--<VBox width="100%" direction="Column" id="vbox01">-->
-				<!--<NavContainer id="__container0">-->
-				<!--	<pages>-->
-				<!--		<Page title="Page 1" id="__page1">-->
-				<!--			<content>-->
-				<!--				<l:VerticalLayout>-->
-				<!--					<core:HTML-->
-				<!--						content='&lt;div class=&quot;content&quot;&gt;&lt;h4&gt;Lorem ipsum&lt;/h4&gt;&lt;div&gt;Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.&lt;/div&gt;&lt;a target=&quot;_blank&quot; href=&quot;http://en.wikipedia.org/wiki/Lorem_ipsum&quot;&gt;Learn more about Lorem Ipsum ...&lt;/a&gt;&lt;/div&gt;'></core:HTML>-->
-				<!--				</l:VerticalLayout>-->
-				<!--			</content>-->
-				<!--		</Page>-->
-				<!--<Page title="Page 2" id="__page2"/>-->
-				<!--	</pages>-->
-				<!--</NavContainer>-->
-				<!--<HBox width="100%" id="__hbox0">-->
-				<!--<items>-->
-				<!--	<ComboBox id="cbox" items="{/Postcode}">-->
-				<!--		<core:Item key="{postcode}" text="{postcode} {state.state}"/>-->
-				<!--<core:ListItem text="List Item 3" key="item3" id="__item2"/>-->
-				<!--	</ComboBox>-->
-				<!--</items>-->
-				<!--<List id="storesList" items="{/Store}">-->
-				<!--	<ObjectListItem-->
-				<!--		type="Active"-->
-				<!--		title="{store_id}">-->
-				<!--	</ObjectListItem>-->
-				<!--</List>-->
-				<!--</HBox>-->
-				<!--<items/>-->
-				<!--</VBox>-->
 			</Page>
 		</pages>
 	</App>

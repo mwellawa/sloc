@@ -4,7 +4,7 @@ service namespace "sloc.data" {
 	"sloc.db::model.Store" as "Store" key ("store_id");
 	
 	"sloc.db::cv_storeloc" as "StoreLocation" 
-	with ("id", "state_state", "postcode_postcode", "suburb_suburb", "distance") 
+	with ("id", "state_state", "postcode_postcode", "suburb_suburb", "distance", "logitude", "latitude") 
 	key ("id")
 	parameters via entity;
 	
